@@ -30,17 +30,16 @@ where
     let mut provider_builder: opentelemetry_sdk::trace::Builder = TracerProvider::builder()
         .with_span_processor(processor)
         .with_config(
-            sdktrace::config()
+            sdktrace::Config::default()
                 .with_resource(resource)
                 .with_sampler(sdktrace::Sampler::AlwaysOn),
         );
     provider_builder = transform(provider_builder);
-    Ok(provider_builder.build().versioned_tracer(
-        "opentelemetry-stdio",
-        Some(env!("CARGO_PKG_VERSION")),
-        None::<&'static str>,
-        None,
-    ))
+    Ok(provider_builder
+        .build()
+        .tracer_builder("opentelemetry-stdio")
+        .with_version(env!("CARGO_PKG_VERSION"))
+        .build())
 }
 
 #[derive(Debug, Default)]
